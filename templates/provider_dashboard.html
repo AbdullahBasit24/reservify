@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservify | Provider Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <a class="brand" href="{{ url_for('dashboard_redirect') }}"><i class="fas fa-calendar-check"></i> Reservify Provider</a>
+            <div class="links">
+                <span class="badge" style="background: #28a745;"><i class="fas fa-briefcase"></i> {{ user }}</span>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="banner" style="height: 250px;">
+        <div class="banner-bg"></div>
+        <div class="banner-content">
+            <h1>My Services</h1>
+            <p>Manage the services you offer.</p>
+        </div>
+    </div>
+
+    <main class="container" style="padding-top: 50px;">
+        {% if request.args.get('msg') %}
+        <div class="msg success">{{ request.args.get('msg') }}</div>
+        {% endif %}
+
+        <div style="margin-bottom: 20px; text-align: right;">
+            <a href="{{ url_for('add_service') }}" class="btn">
+                <i class="fas fa-plus"></i> Add New Service
+            </a>
+        </div>
+
+        <div class="card">
+            {% if services %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in services %}
+                    <tr>
+                        <td>{{ s[0] }}</td>
+                        <td>{{ s[1] }}</td>
+                        <td>{{ s[2] }}</td>
+                        <td>Rs {{ s[3] }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_service', service_id=s[0]) }}" 
+                               style="color: #ffc107; margin-right: 15px; font-weight: 600; text-decoration: none;">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{{ url_for('delete_service', service_id=s[0]) }}" 
+                               onclick="return confirm('Delete this service? This cannot be undone.')"
+                               style="color: #dc3545; font-weight: 600; text-decoration: none;">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="text-align: center; color: #666;">You haven't listed any services yet.</p>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

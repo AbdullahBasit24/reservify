@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservify | Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header>
+    <div class="container" style="padding: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+        <a class="brand" href="{{ url_for('dashboard_redirect') }}"><i class="fas fa-calendar-check"></i> Reservify</a>
+        <div class="links">
+            {% if user %}
+                <a href="{{ url_for('profile') }}" class="badge"><i class="fas fa-user"></i> {{ user }}</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+                <a class="primary" href="{{ url_for('signup') }}">Sign Up</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<div class="banner">
+    <div class="banner-bg"></div>
+    <div class="banner-content">
+        <h1>Explore the World with Reservify</h1>
+        <p>Book Hotels, Flights, Rides, and Events with ease.</p>
+    </div>
+</div>
+
+<main class="container">
+    {% if message %}
+        <div class="msg ok">{{ message }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="msg err">{{ error }}</div>
+    {% endif %}
+
+
+    
+
+
+
+    <section class="services">
+        <h2><i class="fas fa-concierge-bell"></i> What do you want to book?</h2>
+        <div class="cta-grid">
+            <a class="cta-btn cta-hotel" href="{{ url_for('hotels') }}"><i class="fas fa-hotel"></i> Hotels</a>
+            <a class="cta-btn cta-ride" href="{{ url_for('rides') }}"><i class="fas fa-car-side"></i> Rides</a>
+            <a class="cta-btn cta-event" href="{{ url_for('events') }}"><i class="fas fa-calendar-day"></i> Events</a>
+            <a class="cta-btn cta-flight" href="{{ url_for('flights') }}"><i class="fas fa-plane-departure"></i> Flights</a>
+        </div>
+    </section>
+
+</main>
+
+
+
+<footer>
+    <div class="container">Reservify DBMS Project • Flask + SQL Server</div>
+</footer>
+</body>
+</html>
+

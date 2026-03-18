@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Provider Signup | Reservify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .auth-container {
+            max-width: 500px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .auth-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .auth-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .auth-container input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <a class="brand" href="{{ url_for('dashboard_redirect') }}"><i class="fas fa-calendar-check"></i> Reservify Provider</a>
+            <div class="links">
+                <a href="{{ url_for('login') }}">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="auth-container">
+        <h2>Become a Partner</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="msg {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <label>Full Name</label>
+            <input type="text" name="full_name" required>
+            
+            <label>Email Address</label>
+            <input type="email" name="email" required>
+            
+            <label>Provider/Business Name</label>
+            <input type="text" name="provider_name" placeholder="e.g. Grand Hotel" required>
+            
+            <label>Contact Number</label>
+            <input type="text" name="contact" required>
+
+            <label>Password</label>
+            <input type="password" name="password" required>
+            
+            <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Register as Partner</button>
+        </form>
+        <p style="text-align: center; margin-top: 20px;">
+            Already a partner? <a href="{{ url_for('login') }}">Login here</a>
+        </p>
+    </div>
+</body>
+</html>

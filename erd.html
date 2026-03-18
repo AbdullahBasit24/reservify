@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReservifyDB - Chen Notation ERD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid #4a90e2;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+
+        .legend {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 2px solid #e0e0e0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .symbol {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .symbol-entity {
+            width: 50px;
+            height: 35px;
+            border: 3px solid #3498db;
+            background: white;
+            border-radius: 0;
+        }
+
+        .symbol-attribute {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #2ecc71;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .symbol-relationship {
+            width: 45px;
+            height: 45px;
+            border: 3px solid #e74c3c;
+            background: white;
+            transform: rotate(45deg);
+        }
+
+        .symbol-relationship span {
+            transform: rotate(-45deg);
+        }
+
+        .erd-main {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: auto;
+            min-height: 900px;
+        }
+
+        /* Entity Styles */
+        .entity {
+            position: absolute;
+            background: white;
+            border: 3px solid #3498db;
+            border-radius: 0;
+            padding: 15px;
+            min-width: 180px;
+            z-index: 10;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+        }
+
+        .entity h3 {
+            text-align: center;
+            color: #2980b9;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3498db;
+            font-size: 1.1rem;
+        }
+
+        /* Attribute Styles */
+        .attribute {
+            position: absolute;
+            background: white;
+            border: 3px solid #2ecc71;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.85rem;
+            z-index: 5;
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.2);
+            min-width: 80px;
+            min-height: 80px;
+        }
+
+        /* Relationship Styles */
+        .relationship {
+            position: absolute;
+            background: white;
+            border: 3px solid #e74c3c;
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 15;
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.2);
+            width: 50px;
+            height: 50px;
+        }
+
+        .relationship span {
+            transform: rotate(-45deg);
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Connection Lines */
+        .line {
+            position: absolute;
+            background: #2c3e50;
+            z-index: 1;
+        }
+
+        /* Key Indicators */
+        .pk {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .fk {
+            color: #9b59b6;
+            font-weight: bold;
+        }
+
+        /* Entity Positions */
+        .roles-entity { top: 100px; left: 100px; }
+        .users-entity { top: 100px; left: 400px; }
+        .providers-entity { top: 100px; left: 700px; }
+        .locations-entity { top: 100px; left: 1000px; }
+        
+        .services-entity { top: 350px; left: 600px; width: 200px; }
+        
+        .hoteldetails-entity { top: 550px; left: 200px; }
+        .rooms-entity { top: 550px; left: 450px; }
+        .vehicles-entity { top: 550px; left: 800px; }
+        .ridedetails-entity { top: 550px; left: 1050px; }
+        
+        .eventdetails-entity { top: 750px; left: 300px; }
+        .flightdetails-entity { top: 750px; left: 600px; }
+        .bookings-entity { top: 750px; left: 900px; width: 200px; }
+        .payments-entity { top: 750px; left: 1200px; }
+
+        /* Attribute Positions */
+        .role-id-attr { top: 50px; left: 80px; }
+        .user-id-attr { top: 50px; left: 380px; }
+        .provider-id-attr { top: 50px; left: 680px; }
+        .location-id-attr { top: 50px; left: 980px; }
+        
+        .service-id-attr { top: 300px; left: 580px; }
+        .created-at-attr { top: 300px; left: 620px; }
+        
+        .hotel-id-attr { top: 500px; left: 180px; }
+        .room-id-attr { top: 500px; left: 430px; }
+        .vehicle-id-attr { top: 500px; left: 780px; }
+        .ride-id-attr { top: 500px; left: 1030px; }
+        
+        .event-id-attr { top: 700px; left: 280px; }
+        .flight-id-attr { top: 700px; left: 580px; }
+        .booking-id-attr { top: 700px; left: 880px; }
+        .payment-id-attr { top: 700px; left: 1180px; }
+        
+        .booking-date-attr { top: 850px; left: 900px; }
+        .payment-date-attr { top: 850px; left: 1200px; }
+
+        /* Relationship Positions */
+        .rel-has-role { top: 150px; left: 270px; }
+        .rel-has-provider { top: 150px; left: 570px; }
+        .rel-provides { top: 280px; left: 680px; }
+        .rel-located-in { top: 280px; left: 800px; }
+        
+        .rel-has-hotel { top: 450px; left: 380px; }
+        .rel-has-rooms { top: 600px; left: 350px; }
+        .rel-has-ride { top: 450px; left: 920px; }
+        .rel-uses-vehicle { top: 600px; left: 920px; }
+        
+        .rel-has-event { top: 650px; left: 450px; }
+        .rel-has-flight { top: 650px; left: 750px; }
+        
+        .rel-makes-booking { top: 650px; left: 750px; }
+        .rel-for-service { top: 650px; left: 850px; }
+        .rel-includes { top: 800px; left: 550px; width: 60px; height: 60px; }
+        .rel-has-payment { top: 800px; left: 1100px; }
+
+        /* Line Positions */
+        .line-1 { top: 125px; left: 175px; width: 90px; height: 3px; }
+        .line-2 { top: 125px; left: 475px; width: 90px; height: 3px; }
+        .line-3 { top: 175px; left: 625px; width: 3px; height: 60px; }
+        .line-4 { top: 175px; left: 825px; width: 3px; height: 60px; }
+        
+        .line-5 { top: 325px; left: 425px; width: 85px; height: 3px; }
+        .line-6 { top: 400px; left: 350px; width: 3px; height: 50px; }
+        .line-7 { top: 575px; left: 300px; width: 85px; height: 3px; }
+        .line-8 { top: 325px; left: 775px; width: 85px; height: 3px; }
+        .line-9 { top: 400px; left: 850px; width: 3px; height: 50px; }
+        .line-10 { top: 575px; left: 850px; width: 85px; height: 3px; }
+        
+        .line-11 { top: 425px; left: 500px; width: 3px; height: 70px; }
+        .line-12 { top: 425px; left: 650px; width: 3px; height: 70px; }
+        
+        .line-13 { top: 650px; left: 650px; width: 50px; height: 3px; }
+        .line-14 { top: 650px; left: 775px; width: 50px; height: 3px; }
+        .line-15 { top: 775px; left: 800px; width: 3px; height: 50px; }
+        .line-16 { top: 775px; left: 850px; width: 3px; height: 50px; }
+        
+        .line-17 { top: 825px; left: 550px; width: 150px; height: 3px; }
+        .line-18 { top: 825px; left: 650px; width: 150px; height: 3px; }
+        
+        .line-19 { top: 800px; left: 1050px; width: 50px; height: 3px; }
+
+        /* Cardinality Labels */
+        .cardinality {
+            position: absolute;
+            background: white;
+            border: 2px solid #f39c12;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #d35400;
+            font-size: 0.9rem;
+            z-index: 20;
+        }
+
+        .card-1 { top: 120px; left: 240px; }
+        .card-2 { top: 120px; left: 320px; }
+        .card-3 { top: 120px; left: 540px; }
+        .card-4 { top: 120px; left: 620px; }
+        .card-5 { top: 200px; left: 660px; }
+        .card-6 { top: 200px; left: 690px; }
+        .card-7 { top: 200px; left: 790px; }
+        .card-8 { top: 200px; left: 830px; }
+        .card-9 { top: 340px; left: 410px; }
+        .card-10 { top: 340px; left: 440px; }
+        .card-11 { top: 380px; left: 350px; }
+        .card-12 { top: 380px; left: 360px; }
+        .card-13 { top: 600px; left: 320px; }
+        .card-14 { top: 600px; left: 380px; }
+        .card-15 { top: 340px; left: 760px; }
+        .card-16 { top: 340px; left: 790px; }
+        .card-17 { top: 380px; left: 850px; }
+        .card-18 { top: 380px; left: 860px; }
+        .card-19 { top: 600px; left: 820px; }
+        .card-20 { top: 600px; left: 880px; }
+        .card-21 { top: 450px; left: 480px; }
+        .card-22 { top: 450px; left: 520px; }
+        .card-23 { top: 450px; left: 630px; }
+        .card-24 { top: 450px; left: 670px; }
+        .card-25 { top: 675px; left: 630px; }
+        .card-26 { top: 675px; left: 670px; }
+        .card-27 { top: 675px; left: 755px; }
+        .card-28 { top: 675px; left: 795px; }
+        .card-29 { top: 800px; left: 790px; }
+        .card-30 { top: 800px; left: 810px; }
+        .card-31 { top: 800px; left: 840px; }
+        .card-32 { top: 800px; left: 860px; }
+        .card-33 { top: 850px; left: 520px; }
+        .card-34 { top: 850px; left: 580px; }
+        .card-35 { top: 850px; left: 680px; }
+        .card-36 { top: 850px; left: 720px; }
+        .card-37 { top: 825px; left: 1050px; }
+        .card-38 { top: 825px; left: 1100px; }
+
+        .relationship-connections {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .controls button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0 10px;
+            transition: background 0.3s;
+        }
+
+        .controls button:hover {
+            background: #2980b9;
+        }
+
+        @media (max-width: 1200px) {
+            .erd-main {
+                transform: scale(0.85);
+                transform-origin: top left;
+                width: 118%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .erd-main {
+                transform: scale(0.65);
+                transform-origin: top left;
+                width: 154%;
+            }
+            .legend {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ReservifyDB - Chen Notation ER Diagram</h1>
+            <p>Entities (Rectangles), Attributes (Ovals), Relationships (Diamonds)</p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="symbol symbol-entity"></div>
+                <span>Entity (Table)</span>
+            </div>
+            <div class="legend-item">
+                <div class="symbol symbol-attribute"></div>
+                <span>Attribute (Column)</span>
+            </div>
+            <div class="legend-item">
+                <div class="symbol symbol-relationship">
+                    <span>R</span>
+                </div>
+                <span>Relationship</span>
+            </div>
+            <div class="legend-item">
+                <span style="color: #e74c3c; font-weight: bold;">Red Text</span>
+                <span>Primary Key</span>
+            </div>
+            <div class="legend-item">
+                <span style="color: #9b59b6; font-weight: bold;">Purple Text</span>
+                <span>Foreign Key</span>
+            </div>
+        </div>
+
+        <div class="erd-main">
+            <!-- Relationship Connections -->
+            <div class="relationship-connections">
+                <div class="line line-1"></div>
+                <div class="line line-2"></div>
+                <div class="line line-3"></div>
+                <div class="line line-4"></div>
+                <div class="line line-5"></div>
+                <div class="line line-6"></div>
+                <div class="line line-7"></div>
+                <div class="line line-8"></div>
+                <div class="line line-9"></div>
+                <div class="line line-10"></div>
+                <div class="line line-11"></div>
+                <div class="line line-12"></div>
+                <div class="line line-13"></div>
+                <div class="line line-14"></div>
+                <div class="line line-15"></div>
+                <div class="line line-16"></div>
+                <div class="line line-17"></div>
+                <div class="line line-18"></div>
+                <div class="line line-19"></div>
+            </div>
+
+            <!-- Cardinality Labels -->
+            <div class="cardinality card-1">1</div>
+            <div class="cardinality card-2">N</div>
+            <div class="cardinality card-3">1</div>
+            <div class="cardinality card-4">1</div>
+            <div class="cardinality card-5">1</div>
+            <div class="cardinality card-6">N</div>
+            <div class="cardinality card-7">N</div>
+            <div class="cardinality card-8">1</div>
+            <div class="cardinality card-9">N</div>
+            <div class="cardinality card-10">1</div>
+            <div class="cardinality card-11">1</div>
+            <div class="cardinality card-12">1</div>
+            <div class="cardinality card-13">N</div>
+            <div class="cardinality card-14">1</div>
+            <div class="cardinality card-15">N</div>
+            <div class="cardinality card-16">1</div>
+            <div class="cardinality card-17">1</div>
+            <div class="cardinality card-18">N</div>
+            <div class="cardinality card-19">N</div>
+            <div class="cardinality card-20">1</div>
+            <div class="cardinality card-21">1</div>
+            <div class="cardinality card-22">1</div>
+            <div class="cardinality card-23">1</div>
+            <div class="cardinality card-24">1</div>
+            <div class="cardinality card-25">N</div>
+            <div class="cardinality card-26">1</div>
+            <div class="cardinality card-27">N</div>
+            <div class="cardinality card-28">1</div>
+            <div class="cardinality card-29">N</div>
+            <div class="cardinality card-30">1</div>
+            <div class="cardinality card-31">N</div>
+            <div class="cardinality card-32">1</div>
+            <div class="cardinality card-33">1</div>
+            <div class="cardinality card-34">1</div>
+            <div class="cardinality card-35">1</div>
+            <div class="cardinality card-36">1</div>
+            <div class="cardinality card-37">1</div>
+            <div class="cardinality card-38">1</div>
+
+            <!-- Entities -->
+            <div class="entity roles-entity">
+                <h3>Roles</h3>
+                <div><span class="pk">role_id</span></div>
+                <div>role_name</div>
+            </div>
+
+            <div class="entity users-entity">
+                <h3>Users</h3>
+                <div><span class="pk">user_id</span></div>
+                <div>full_name</div>
+                <div>email</div>
+                <div>phone_number</div>
+                <div>password_hash</div>
+                <div><span class="fk">role_id</span></div>
+                <div>created_at</div>
+            </div>
+
+            <div class="entity providers-entity">
+                <h3>Providers</h3>
+                <div><span class="pk">provider_id</span></div>
+                <div><span class="fk">user_id</span></div>
+                <div>provider_name</div>
+                <div>contact</div>
+                <div>created_at</div>
+            </div>
+
+            <div class="entity locations-entity">
+                <h3>Locations</h3>
+                <div><span class="pk">location_id</span></div>
+                <div>country</div>
+                <div>city</div>
+                <div>area</div>
+                <div>address</div>
+            </div>
+
+            <div class="entity services-entity">
+                <h3>Services</h3>
+                <div><span class="pk">service_id</span></div>
+                <div><span class="fk">provider_id</span></div>
+                <div>service_category</div>
+                <div>service_title</div>
+                <div>base_price</div>
+                <div><span class="fk">location_id</span></div>
+                <div>created_at</div>
+            </div>
+
+            <div class="entity hoteldetails-entity">
+                <h3>HotelDetails</h3>
+                <div><span class="pk">hotel_id</span></div>
+                <div><span class="fk">service_id</span></div>
+                <div>star_rating</div>
+                <div>amenities</div>
+            </div>
+
+            <div class="entity rooms-entity">
+                <h3>Rooms</h3>
+                <div><span class="pk">room_id</span></div>
+                <div><span class="fk">hotel_id</span></div>
+                <div>room_type</div>
+                <div>price_per_night</div>
+                <div>availability_status</div>
+            </div>
+
+            <div class="entity vehicles-entity">
+                <h3>Vehicles</h3>
+                <div><span class="pk">vehicle_id</span></div>
+                <div>vehicle_type</div>
+                <div>model</div>
+                <div>plate_number</div>
+            </div>
+
+            <div class="entity ridedetails-entity">
+                <h3>RideDetails</h3>
+                <div><span class="pk">ride_id</span></div>
+                <div><span class="fk">service_id</span></div>
+                <div><span class="fk">vehicle_id</span></div>
+                <div>driver_license</div>
+            </div>
+
+            <div class="entity eventdetails-entity">
+                <h3>EventDetails</h3>
+                <div><span class="pk">event_id</span></div>
+                <div><span class="fk">service_id</span></div>
+                <div>event_date</div>
+                <div>duration_hours</div>
+                <div>capacity</div>
+            </div>
+
+            <div class="entity flightdetails-entity">
+                <h3>FlightDetails</h3>
+                <div><span class="pk">flight_id</span></div>
+                <div><span class="fk">service_id</span></div>
+                <div>airline</div>
+                <div>flight_number</div>
+                <div>departure_airport</div>
+                <div>arrival_airport</div>
+                <div>departure_time</div>
+                <div>arrival_time</div>
+                <div>seat_class</div>
+                <div>price</div>
+            </div>
+
+            <div class="entity bookings-entity">
+                <h3>Bookings</h3>
+                <div><span class="pk">booking_id</span></div>
+                <div><span class="fk">user_id</span></div>
+                <div><span class="fk">service_id</span></div>
+                <div><span class="fk">room_id</span></div>
+                <div><span class="fk">ride_id</span></div>
+                <div><span class="fk">event_id</span></div>
+                <div><span class="fk">flight_id</span></div>
+                <div>status</div>
+                <div>pickup_location</div>
+                <div>dropoff_location</div>
+                <div>booking_date</div>
+            </div>
+
+            <div class="entity payments-entity">
+                <h3>Payments</h3>
+                <div><span class="pk">payment_id</span></div>
+                <div><span class="fk">booking_id</span></div>
+                <div>amount</div>
+                <div>payment_method</div>
+                <div>payment_date</div>
+            </div>
+
+            <!-- Attributes -->
+            <div class="attribute role-id-attr">
+                <span class="pk">role_id</span>
+            </div>
+
+            <div class="attribute user-id-attr">
+                <span class="pk">user_id</span>
+            </div>
+
+            <div class="attribute provider-id-attr">
+                <span class="pk">provider_id</span>
+            </div>
+
+            <div class="attribute location-id-attr">
+                <span class="pk">location_id</span>
+            </div>
+
+            <div class="attribute service-id-attr">
+                <span class="pk">service_id</span>
+            </div>
+
+            <div class="attribute created-at-attr">
+                created_at
+            </div>
+
+            <div class="attribute hotel-id-attr">
+                <span class="pk">hotel_id</span>
+            </div>
+
+            <div class="attribute room-id-attr">
+                <span class="pk">room_id</span>
+            </div>
+
+            <div class="attribute vehicle-id-attr">
+                <span class="pk">vehicle_id</span>
+            </div>
+
+            <div class="attribute ride-id-attr">
+                <span class="pk">ride_id</span>
+            </div>
+
+            <div class="attribute event-id-attr">
+                <span class="pk">event_id</span>
+            </div>
+
+            <div class="attribute flight-id-attr">
+                <span class="pk">flight_id</span>
+            </div>
+
+            <div class="attribute booking-id-attr">
+                <span class="pk">booking_id</span>
+            </div>
+
+            <div class="attribute payment-id-attr">
+                <span class="pk">payment_id</span>
+            </div>
+
+            <div class="attribute booking-date-attr">
+                booking_date
+            </div>
+
+            <div class="attribute payment-date-attr">
+                payment_date
+            </div>
+
+            <!-- Relationships -->
+            <div class="relationship rel-has-role">
+                <span>HAS ROLE</span>
+            </div>
+
+            <div class="relationship rel-has-provider">
+                <span>IS PROVIDER</span>
+            </div>
+
+            <div class="relationship rel-provides">
+                <span>PROVIDES</span>
+            </div>
+
+            <div class="relationship rel-located-in">
+                <span>LOCATED IN</span>
+            </div>
+
+            <div class="relationship rel-has-hotel">
+                <span>HAS HOTEL</span>
+            </div>
+
+            <div class="relationship rel-has-rooms">
+                <span>HAS ROOMS</span>
+            </div>
+
+            <div class="relationship rel-has-ride">
+                <span>HAS RIDE</span>
+            </div>
+
+            <div class="relationship rel-uses-vehicle">
+                <span>USES VEHICLE</span>
+            </div>
+
+            <div class="relationship rel-has-event">
+                <span>HAS EVENT</span>
+            </div>
+
+            <div class="relationship rel-has-flight">
+                <span>HAS FLIGHT</span>
+            </div>
+
+            <div class="relationship rel-makes-booking">
+                <span>MAKES BOOKING</span>
+            </div>
+
+            <div class="relationship rel-for-service">
+                <span>FOR SERVICE</span>
+            </div>
+
+            <div class="relationship rel-includes">
+                <span>INCLUDES</span>
+            </div>
+
+            <div class="relationship rel-has-payment">
+                <span>HAS PAYMENT</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="zoomIn()">Zoom In (+)</button>
+            <button onclick="zoomOut()">Zoom Out (-)</button>
+            <button onclick="resetZoom()">Reset Zoom</button>
+            <button onclick="toggleLegend()">Toggle Legend</button>
+        </div>
+
+        <div style="margin-top: 30px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+            <h3 style="color: #2c3e50; margin-bottom: 15px; text-align: center;">Database Schema Summary</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: #3498db; margin-bottom: 10px;">Main Entities</h4>
+                    <ul style="list-style-type: none;">
+                        <li>• Users (customers, providers, admins)</li>
+                        <li>• Services (hotels, rides, events, flights)</li>
+                        <li>• Bookings (reservations)</li>
+                        <li>• Payments (transactions)</li>
+                    </ul>
+                </div>
+                <div style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: #3498db; margin-bottom: 10px;">Key Relationships</h4>
+                    <ul style="list-style-type: none;">
+                        <li>• One User HAS ONE Role (1:1)</li>
+                        <li>• One Provider PROVIDES Many Services (1:N)</li>
+                        <li>• One User MAKES Many Bookings (1:N)</li>
+                        <li>• One Booking HAS ONE Payment (1:1)</li>
+                    </ul>
+                </div>
+                <div style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: #3498db; margin-bottom: 10px;">Service Types</h4>
+                    <ul style="list-style-type: none;">
+                        <li>• Hotel → HotelDetails → Rooms</li>
+                        <li>• Ride → RideDetails → Vehicles</li>
+                        <li>• Event → EventDetails</li>
+                        <li>• Flight → FlightDetails</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let scale = 1;
+        const erdMain = document.querySelector('.erd-main');
+        const legend = document.querySelector('.legend');
+
+        function zoomIn() {
+            scale += 0.1;
+            updateZoom();
+        }
+
+        function zoomOut() {
+            scale = Math.max(0.5, scale - 0.1);
+            updateZoom();
+        }
+
+        function resetZoom() {
+            scale = 1;
+            updateZoom();
+        }
+
+        function updateZoom() {
+            erdMain.style.transform = `scale(${scale})`;
+            erdMain.style.transformOrigin = 'top left';
+        }
+
+        function toggleLegend() {
+            legend.style.display = legend.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        // Initial zoom for better viewing
+        window.onload = function() {
+            if (window.innerWidth < 1200) {
+                scale = 0.85;
+                updateZoom();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservify | Hotels</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <a class="brand" href="{{ url_for('dashboard_redirect') }}"><i class="fas fa-calendar-check"></i> Reservify</a>
+            <div class="links">
+                {% if user %}
+                    <a href="{{ url_for('profile') }}" class="badge"><i class="fas fa-user"></i> {{ user }}</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a class="primary" href="{{ url_for('signup') }}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="banner">
+        <div class="banner-bg banner-hotels"></div>
+        <div class="banner-content">
+            <h1><i class="fas fa-hotel"></i> Hotel Booking</h1>
+            <p>Stay in comfort at the best hotels.</p>
+        </div>
+    </div>
+
+    <main class="container">
+        <div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="msg {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="filter-bar" style="margin-bottom: 20px; text-align: right;">
+                <form method="GET" action="{{ url_for('hotels') }}" style="display: inline-block;">
+                    <label for="city-filter" style="margin-right: 8px; font-weight: 500;">Filter by City:</label>
+                    <select id="city-filter" name="city" onchange="this.form.submit()" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                        <option value="">All Cities</option>
+                        {% for loc in locations %}
+                        <option value="{{ loc }}" {% if city == loc %}selected{% endif %}>{{ loc }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+
+            {% if services and services|length > 0 %}
+                <div class="grid">
+                    {% for s in services %}
+                        <div class="card">
+                            <h3>{{ s.title }}</h3>
+                            <p class="price">Rs {{ '%.0f'|format(s.price) }}</p>
+                            <p><strong>Hotel:</strong> {{ s.provider }}</p>
+                            <p><i class="fas fa-map-marker-alt"></i> {{ s.city }}{% if s.area %}, {{ s.area }}{% endif %}</p>
+                            
+                            <form class="book" method="POST" action="{{ url_for('book') }}">
+                                <input type="hidden" name="service_id" value="{{ s.id }}">
+                                
+                                <label for="email_{{ s.id }}" style="font-size: 0.9rem; font-weight: 600;">Email</label>
+                                <input type="email" id="email_{{ s.id }}" name="email" placeholder="you@example.com" required>
+                                
+                                <label for="room_{{ s.id }}" style="font-size: 0.9rem; font-weight: 600;">Select Room</label>
+                                <select name="room_id" id="room_{{ s.id }}" required>
+                                    {% for r in hotel_options.get(s.id, []) %}
+                                        <option value="{{ r.id }}">{{ r.label }}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                                <button class="btn" type="submit">Book Room</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty">
+                    <p>No hotel services found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

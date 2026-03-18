@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservify | My Bookings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <a class="brand" href="{{ url_for('dashboard_redirect') }}"><i class="fas fa-calendar-check"></i> Reservify</a>
+            <div class="links">
+                {% if user %}
+                    <a href="{{ url_for('profile') }}" class="badge"><i class="fas fa-user"></i> {{ user }}</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a class="primary" href="{{ url_for('signup') }}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="banner">
+        <div class="banner-bg"></div>
+        <div class="banner-content">
+            <h1><i class="fas fa-receipt"></i> {{ page_title if page_title else 'My Bookings' }}</h1>
+            <p>Review your reservations and their status.</p>
+        </div>
+    </div>
+
+    <main class="container">
+        <section>
+            {% if bookings and bookings|length > 0 %}
+                <div class="card">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Service</th>
+                                <th>Category</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in bookings %}
+                            <tr>
+                                <td>{{ b.id }}</td>
+                                <td>
+                                    {{ b.title }}
+                                    {% if b.category == 'Ride' and b.pickup and b.dropoff %}
+                                        <div style="font-size: 0.85em; color: #555; margin-top: 4px;">
+                                            <i class="fas fa-map-marker-alt" style="color: #007bff;"></i> <strong>From:</strong> {{ b.pickup }}<br>
+                                            <i class="fas fa-map-pin" style="color: #dc3545;"></i> <strong>To:</strong> {{ b.dropoff }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ b.category }}</td>
+                                <td>{{ b.date }}</td>
+                                <td>{{ b.status }}</td>
+                                <td>
+                                    {% if b.status == 'Booked' %}
+                                    <a href="{{ url_for('cancel_booking', booking_id=b.id) }}" 
+                                       onclick="return confirm('Are you sure you want to cancel this booking?')"
+                                       style="color: #dc3545; font-weight: 600; text-decoration: none;">
+                                        <i class="fas fa-times-circle"></i> Cancel
+                                    </a>
+                                    {% else %}
+                                    <span style="color: #999;">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty">No bookings found.</div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

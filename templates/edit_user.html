@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit User | Reservify Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .form-card {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <a class="brand" href="{{ url_for('dashboard_redirect') }}"><i class="fas fa-calendar-check"></i> Reservify Admin</a>
+            <div class="links">
+                <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="form-card">
+            <h2>Edit User</h2>
+            <form method="POST">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Full Name</label>
+                <input type="text" name="full_name" value="{{ full_name }}" required style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px;">
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Email Address</label>
+                <input type="email" name="email" value="{{ email }}" required style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px;">
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Phone Number</label>
+                <input type="tel" name="phone" value="{{ phone }}" required style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px;">
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">New Password (leave blank to keep current)</label>
+                <input type="password" name="password" placeholder="Enter new password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px;">
+                
+                <button type="submit" class="btn" style="width: 100%;">Update User</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

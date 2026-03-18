@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Service | Reservify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .form-card {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .full-width {
+            grid-column: span 2;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .dynamic-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #dc3545;
+            cursor: pointer;
+        }
+        .add-btn {
+            background: #e9ecef;
+            color: #333;
+            border: 1px dashed #adb5bd;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .add-btn:hover {
+            background: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <a class="brand" href="{{ url_for('dashboard_redirect') }}"><i class="fas fa-calendar-check"></i> Reservify Provider</a>
+            <div class="links">
+                <a href="{{ url_for('provider_dashboard') }}">Back to Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="form-card">
+            <h2 style="margin-bottom: 25px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px;">Add New Service</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="msg {{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+            <form method="POST">
+                <div class="form-grid">
+                    <div class="full-width">
+                        <label>Category</label>
+                        <select name="category" id="categorySelect" required onchange="toggleFields()">
+                            <option value="">Select Category</option>
+                            <option value="Hotel">Hotel</option>
+                            <option value="Ride">Ride</option>
+                            <option value="Flight">Flight</option>
+                            <option value="Event">Event</option>
+                        </select>
+                    </div>
+
+                    <div class="full-width">
+                        <label>Service Title</label>
+                        <input type="text" name="title" placeholder="e.g. Pearl Continental Lahore" required>
+                    </div>
+
+                    <div>
+                        <label>Starting Price (Rs)</label>
+                        <input type="number" name="price" placeholder="Base price" required>
+                    </div>
+
+                    <div>
+                        <label>City</label>
+                        <select name="city" required>
+                            {% for loc in locations %}
+                            <option value="{{ loc }}">{{ loc }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Hotel Fields -->
+                <div id="hotelFields" style="display:none; margin-top: 30px;">
+                    <h4 style="margin-bottom: 15px; color: #007bff;"><i class="fas fa-hotel"></i> Hotel Rooms</h4>
+                    <div id="roomContainer">
+                        <!-- Dynamic Rooms will be added here -->
+                    </div>
+                    <div class="add-btn" onclick="addRoom()"><i class="fas fa-plus"></i> Add Room Type</div>
+                </div>
+
+                <!-- Ride Fields -->
+                <div id="rideFields" style="display:none; margin-top: 30px;">
+                    <h4 style="margin-bottom: 15px; color: #007bff;"><i class="fas fa-car"></i> Vehicles</h4>
+                    <div id="vehicleContainer">
+                        <!-- Dynamic Vehicles -->
+                    </div>
+                    <div class="add-btn" onclick="addVehicle()"><i class="fas fa-plus"></i> Add Vehicle</div>
+                </div>
+
+                <!-- Flight Fields -->
+                <div id="flightFields" style="display:none; margin-top: 30px;">
+                    <h4 style="margin-bottom: 15px; color: #007bff;"><i class="fas fa-plane"></i> Flight Info</h4>
+                    <div class="form-grid" style="margin-bottom: 20px;">
+                        <div>
+                            <label>Airline</label>
+                            <input type="text" name="airline" placeholder="e.g. PIA">
+                        </div>
+                        <div>
+                            <label>Flight Number</label>
+                            <input type="text" name="flight_number" placeholder="e.g. PK-302">
+                        </div>
+                        <div>
+                            <label>Departure Airport</label>
+                            <input type="text" name="dep_airport" placeholder="e.g. LHE">
+                        </div>
+                        <div>
+                            <label>Arrival Airport</label>
+                            <input type="text" name="arr_airport" placeholder="e.g. KHI">
+                        </div>
+                        <div class="full-width">
+                            <label>Departure Time</label>
+                            <input type="datetime-local" name="dep_time">
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 15px; color: #007bff;">Seat Classes</h4>
+                    <div id="classContainer">
+                        <!-- Dynamic Classes -->
+                    </div>
+                    <div class="add-btn" onclick="addClass()"><i class="fas fa-plus"></i> Add Seat Class</div>
+                </div>
+
+                <!-- Event Fields -->
+                <div id="eventFields" style="display:none; margin-top: 30px;">
+                    <h4 style="margin-bottom: 15px; color: #007bff;"><i class="fas fa-calendar-alt"></i> Event Details</h4>
+                    <div class="form-grid">
+                        <div>
+                            <label>Event Date</label>
+                            <input type="date" name="event_date">
+                        </div>
+                        <div>
+                            <label>Duration (Hours)</label>
+                            <input type="number" name="duration" placeholder="e.g. 4">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; margin-top: 30px; font-size: 16px;">Create Service</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        function toggleFields() {
+            const cat = document.getElementById('categorySelect').value;
+
+            function setSection(id, show) {
+                const el = document.getElementById(id);
+                el.style.display = show ? 'block' : 'none';
+                const inputs = el.querySelectorAll('input, select');
+                inputs.forEach(input => input.disabled = !show);
+            }
+
+            setSection('hotelFields', cat === 'Hotel');
+            setSection('rideFields', cat === 'Ride');
+            setSection('eventFields', cat === 'Event');
+            setSection('flightFields', cat === 'Flight');
+            
+            // Initialize with one item if empty
+            if (cat === 'Hotel' && document.getElementById('roomContainer').children.length === 0) addRoom();
+            if (cat === 'Ride' && document.getElementById('vehicleContainer').children.length === 0) addVehicle();
+            if (cat === 'Flight' && document.getElementById('classContainer').children.length === 0) addClass();
+        }
+
+        function addRoom() {
+            const div = document.createElement('div');
+            div.className = 'dynamic-item form-grid';
+            div.innerHTML = `
+                <i class="fas fa-times remove-btn" onclick="this.parentElement.remove()"></i>
+                <div>
+                    <label>Room Type</label>
+                    <input type="text" name="room_type[]" placeholder="e.g. Deluxe Room" required>
+                </div>
+                <div>
+                    <label>Price Per Night</label>
+                    <input type="number" name="room_price[]" placeholder="e.g. 25000" required>
+                </div>
+            `;
+            document.getElementById('roomContainer').appendChild(div);
+        }
+
+        function addVehicle() {
+            const div = document.createElement('div');
+            div.className = 'dynamic-item form-grid';
+            div.innerHTML = `
+                <i class="fas fa-times remove-btn" onclick="this.parentElement.remove()"></i>
+                <div>
+                    <label>Type</label>
+                    <select name="vehicle_type[]">
+                        <option value="Car">Car</option>
+                        <option value="Bike">Bike</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Model</label>
+                    <input type="text" name="vehicle_model[]" placeholder="e.g. Toyota Corolla" required>
+                </div>
+                <div class="full-width">
+                    <label>Plate Number</label>
+                    <input type="text" name="plate_number[]" placeholder="e.g. LEV-123" required>
+                </div>
+            `;
+            document.getElementById('vehicleContainer').appendChild(div);
+        }
+
+        function addClass() {
+            const div = document.createElement('div');
+            div.className = 'dynamic-item form-grid';
+            div.innerHTML = `
+                <i class="fas fa-times remove-btn" onclick="this.parentElement.remove()"></i>
+                <div>
+                    <label>Class</label>
+                    <select name="seat_class[]">
+                        <option value="Economy">Economy</option>
+                        <option value="Business">Business</option>
+                        <option value="First">First Class</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Price</label>
+                    <input type="number" name="class_price[]" placeholder="e.g. 15000" required>
+                </div>
+            `;
+            document.getElementById('classContainer').appendChild(div);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservify | Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <a class="brand" href="{{ url_for('dashboard_redirect') }}"><i class="fas fa-calendar-check"></i> Reservify</a>
+            <div class="links">
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </header>
+    <div class="banner">
+        <div class="banner-bg"></div>
+        <div class="banner-content">
+            <h1><i class="fas fa-user"></i> Account</h1>
+            <p>Edit your details and manage your bookings.</p>
+        </div>
+    </div>
+    <main class="container" style="padding-top: 30px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="msg {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <div class="grid" style="display:grid; grid-template-columns: 320px 1fr; gap: 24px;">
+            <div class="card">
+                <h3>Profile</h3>
+                <form method="POST" action="{{ url_for('profile') }}">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" value="{{ user_info.full_name }}" required>
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{ user_info.email }}" required>
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone" value="{{ user_info.phone_number or '' }}" required>
+                    <button type="submit" class="btn" style="width:100%; margin-top: 10px;">Save</button>
+                    <p style="color:#666; font-size: 0.9rem; margin-top: 10px;">Password changes are managed by Admin.</p>
+                </form>
+            </div>
+            <div>
+                <div class="card">
+                    <h3>My Bookings</h3>
+                    {% if bookings and bookings|length > 0 %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Service</th>
+                                <th>Category</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in bookings %}
+                            <tr>
+                                <td>{{ b.id }}</td>
+                                <td>
+                                    {{ b.title }}
+                                    {% if b.category == 'Ride' and b.pickup and b.dropoff %}
+                                        <div style="font-size: 0.85em; color: #555; margin-top: 4px;">
+                                            <i class="fas fa-map-marker-alt" style="color: #007bff;"></i> <strong>From:</strong> {{ b.pickup }}<br>
+                                            <i class="fas fa-map-pin" style="color: #dc3545;"></i> <strong>To:</strong> {{ b.dropoff }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ b.category }}</td>
+                                <td>{{ b.date }}</td>
+                                <td>{{ b.status }}</td>
+                                <td>
+                                    {% if b.status == 'Booked' %}
+                                    <a href="{{ url_for('cancel_booking', booking_id=b.id) }}" 
+                                       onclick="return confirm('Are you sure you want to cancel this booking?')"
+                                       style="color: #dc3545; font-weight: 600; text-decoration: none;">
+                                        <i class="fas fa-times-circle"></i> Cancel
+                                    </a>
+                                    {% else %}
+                                    <span style="color: #999;">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                        <div class="empty">No bookings found.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
